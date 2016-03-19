@@ -1,0 +1,155 @@
+/*Created by Tommy Gaessler!
+tommy.gaessler@me.com
+https://www.instagram.com/tman_5/
+https://www.linkedin.com/in/tommygaessler
+https://github.com/tommygaessler*/
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+* {
+	box-sizing: border-box;
+}
+
+body
+{
+	margin: 0;
+	padding: 0;
+	background: #2F4858;
+}
+
+.wrapper
+{
+	width: 90%;
+  	max-width: 800px;
+  	margin: auto;
+}
+
+.clearfix
+{
+  	*zoom: 1;
+}
+
+.clearfix:before,
+.clearfix:after 
+{
+	content: " ";
+	display: table;
+}
+
+.clearfix:after 
+{
+	clear: both;
+}
+
+header
+{
+	background: #2F4858;
+}
+
+h1, h2, h3, h4
+{
+	text-align: center;
+	font-family: 'Montserrat', sans-serif;
+}
+
+h1
+{
+	color: white;
+}
+
+h2
+{
+	color: #33658A;
+}
+
+h3
+{
+	color: white;
+}
+
+ul
+{
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+li
+{
+	width: 100%;
+	margin-bottom: 15px;
+	list-style: none;
+	font-family: 'Montserrat', sans-serif;
+}
+
+img
+{
+	width: 100%;
+	box-shadow: 0 0 5px 1px rgba(0,0,0,.2);
+}
+
+a
+{
+	text-decoration: none;
+}
+
+main
+{
+	background: #E6FAFC;
+}
+
+input
+{
+	padding: 10px;
+	display: block;
+	margin: auto;
+	margin-bottom: 10px;
+	color: #33658A;
+	font-size: 20px;
+	font-family: 'Montserrat', sans-serif;
+}
+
+button
+{
+	border: none;
+	background: #33658A;
+	color: white;
+	display: block;
+	margin: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 20px;
+	font-family: 'Montserrat', sans-serif;
+	transition: 0.5s ease;
+}
+
+button:hover
+{
+	transition: 0.5s ease;
+	background: #2F4858;
+}
+
+.background-likes
+{
+	background: white;
+	box-shadow: 0 0 5px 1px rgba(0,0,0,.2);
+}
+
+.background
+{
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding: 10px;
+	background: white;
+	box-shadow: 0 0 5px 1px rgba(0,0,0,.2);
+}
+
+footer
+{
+	background: #2F4858;
+}
+/*IG Colors*/
+/*#125688*/
+/*#4090db*/
