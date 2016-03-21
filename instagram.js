@@ -6,20 +6,20 @@
 
 $(document).ready(function()
 {
-	$(document).keypress(function(e) //runs instagram function when enter is pressed
+	$(document).keypress(function(e) //runs instagram function when user hits enter key
 	{
 	    if(e.which == 13) 
 	    {
-	    	$("input").blur(); //hides keybaord when enter pressed on touch device
-	    	$("button").css("background", "#2F4858"); //acts liked hover/active when enter is pressed
-	        instagram();
-	    	setTimeout(function(){ $("button").css('background', ''); },500) //deletes inline style
+	    	$("input").blur(); //hides keyboard on touch device when enter is hit
+	    	$("button").css("background", "#2F4858"); //changes color of the button when enter is hit, similar to an active/hover
+	        instagram(); //runs instagram function
+	    	setTimeout(function(){ $("button").css('background', ''); },500)
 	    }
 	});
 
-	$("button").on('click', function() //runs instagram function when button is pressed
+	$("button").on('click', function() //runs instagram function when user hits button
 	{
-		if ('createTouch' in document) //fixies sitcky hover for touchdevices
+		if ('createTouch' in document) //fixes sitcky hover on touch devices
 		{
 		    try
 		    {
@@ -39,139 +39,126 @@ $(document).ready(function()
 		    }
 		    catch(e){}
 		}
-		$("button").css("background", "#2F4858");//acts liked hover/active when button is pressed on touch device
-		instagram();
-		setTimeout(function(){ $("button").css('background', ''); },500) //deletes inline style
+		$("button").css("background", "#2F4858");
+		instagram(); //runs instagram function
+		setTimeout(function(){ $("button").css('background', ''); },500)
   	});
 
-  	function instagram() //find most liked instagram photo function
+  	function instagram() //finds most liked instagram picture function
 	{
-		var access_token = "access_token_here"
-
-	    $("li").remove();
-		var user = $('input').val().toLowerCase();
+	    $("li").remove(); //clears previous picture
+		var user = $('input').val().toLowerCase(); //makes input case insensitive
 		var compare = [];
+		var counter = 0;
 		// console.log(user);
 
-	    if (user == "") //sees if text was entered
+	    if (user == "") //if nothing is entered in input box
 	    {
 	    	confirm("Enter a username!");
 	    }
 
-	    else //text was entered
+	    else //if something is entered in input box
 	    {
-		    $.ajax(
-		    //queries users
+		    $.ajax( //uses user input to query instagram usernames
 		    {
 		    	type: "GET",
 		      	dataType: "jsonp",
 		      	cache: false,
-		      	url: "https://api.instagram.com/v1/users/search?q=" + user + "&access_token=" + access_token,
+		      	url: "https://api.instagram.com/v1/users/search?q=" + user + "&access_token=" + token,
 
 		      	success: function(data)
 		  		{
 		      		// console.log(data.data.length);
-			        if (data.data.length == 0) //non existant username and no search results come up
+			        if (data.data.length == 0) //no usernames appear
 			        {
 			        	// console.log("This user name does not exist, 0 came up");
 				        confirm("This username does not exist, check spelling!")
 				    }
 				        
-			        else //existant or non existant username, with search results
+			        else //usernames appear
 			        {
-			        	for(i=0; i<data.data.length; i++) //loops through all username results
+			        	for(i=0; i<data.data.length; i++) //loops through list of usernames
 			          	{
-			          		if (user == data.data[i].username) //if entered username is found
+			          		if (user == data.data[i].username) //a username match is the same as what the user entered in the input box, match!
 			          		{
 			            		// console.log("if" + data.data[i].username);
-			            		var id = data.data[i].id; //get user id
-			            		// console.log(id);
-			            		break; //break out of loop
+			            		var id = data.data[i].id; //finds the user id we need in order to get recent media
+
+			            		$.ajax( //finds the users recent media
+					            {
+					            	type: "GET",
+					              	dataType: "jsonp",
+					              	cache: false,
+					              	url: "https://api.instagram.com/v1/users/" + id + "/media/recent/?access_token=" + token + "&count=33",
+
+					              	success: function(data)
+					              	{
+						                if (data.meta.code == 400) //username is private
+						                {
+						                	confirm("This user is private!");
+						                }
+							                
+						                else if (data.data.length == 0) //username has no posts
+						                {
+						                  	confirm("This user has no posts!");
+						                }
+							                
+						                else
+						                {
+						                	for (var a = 0; a < data.data.length; a++) //loops through usernames recent media
+						                	{
+						                  		var likes = data.data[a].likes.count; //finds users likes
+						                  		// console.log(likes);
+						                  		compare.push(likes); //pushes likes to an array called compare
+						                	}
+
+							                // console.log(compare);
+
+							                for (i = 0; i < compare.length; i++) //loops through array of likes
+							                {
+							                	if (compare[i] > likes) //finds largest number of likes by comparing each like to eachother
+							                	{
+							                    	likes = compare[i];
+							                    	a = compare.indexOf(likes); //grabs the array position of the largest like in the array compare, so we can use that same position to get the picture corresponding to the largest like
+							                  	}
+							                }
+
+							                // console.log(likes);
+							                // console.log(a);
+
+							                if (a === 33) //invisible extra array number bug fix
+							                {
+							                	a -= 1;
+							                  	// console.log(a);
+							                }
+
+							                $(".popular").append("<li><a target='_blank' href='" + data.data[a].link + "'><img src='" + data.data[a].images.standard_resolution.url + "'></img></a></li>"); //appends the picture to the ul in an li
+
+							                $(".likes").append("<li><h2>Number of likes: " + likes + "</h2></li>"); //appends the amount of likes for that picture to a ul in an li
+
+							                $('html, body').animate({
+		        							scrollTop: $("#picture").offset().top }, 1500); //scrolls to the picture
+						              	}
+					              	}
+					            });
+			            		break; //breaks out of the loop
 			          		}
 
-			          		else //if entered username was not found
+			          		else if (user != data.data[i].username) //if the username is not found
+			          		{
+			          			counter++; //counts everytime a username is not found in the list of the usernames
 
-			          		//You only get 1 result that is wrong, or 50 results that are wrong, when a non existant username is entered, but data comes back
-				            {
-				            	if (data.data.length == 50)
-				            	{
-				            		// console.log("Does not exist, 50 came up");
-					            	confirm("This username does not exist, check spelling!")
-					            	break; //break out of loop
-					            }
-
-					            else if (data.data.length == 1)
-					       		{
-					           		// console.log("Does not exist, 1 came up");
-					            	confirm("This username does not exist, check spelling!");
-					            	break; //break out of loop
-					            } 	
-					        }
+			          			if (counter == data.data.length) //sees if the counter is the same as the number of usernames in the list, if it is, the username does not exist
+			          			{
+			          				confirm("This username does not exist, check spelling!");
+			          			}
+			          		}		        
 				        }
-
-				        $.ajax(
-				        //gets users 33 recent media
-			            {
-			            	type: "GET",
-			              	dataType: "jsonp",
-			              	cache: false,
-			              	url: "https://api.instagram.com/v1/users/" + id + "/media/recent/?access_token=" + access_token + "&count=33",
-
-			              	success: function(data)
-			              	{
-				                if (data.meta.code == 400) //user is private
-				                {
-				                	confirm("This user is private!");
-				                }
-					                
-				                else if (data.data.length == 0)
-				                //user has no posts
-				                {
-				                  	confirm("This user has no posts!");
-				                }
-					                
-				                else
-				                {
-				                //loops through users data
-				                	for (var a = 0; a < data.data.length; a++) 
-				                	{
-				                  		var likes = data.data[a].likes.count;//finds likes
-				                  		// console.log(likes);
-				                  		compare.push(likes); //pushes likes to compare array
-				                	}
-
-					                // console.log(compare);
-
-					                for (i = 0; i < compare.length; i++) //loops through array with likes
-					                {
-					                	if (compare[i] > likes) //finds largest like
-					                	{
-					                    	likes = compare[i];
-					                    	a = compare.indexOf(likes); //declares "a" which is array position of largest like
-					                  	}
-					                }
-
-					                // console.log(likes);
-					                // console.log(a);
-
-					                if (a === 33) //fixes invisible number array bug
-					                {
-					                	a -= 1;
-					                  	// console.log(a);
-					                }
-
-					                $(".popular").append("<li><a target='_blank' href='" + data.data[a].link + "'><img src='" + data.data[a].images.standard_resolution.url + "'></img></a></li>"); //uses "a" to append largest liked picture to li
-
-					                $(".likes").append("<li><h2>Number of likes: " + likes + "</h2></li>"); //appends the number of likes the most liked picture has to an li
-
-					                $('html, body').animate({
-        							scrollTop: $("#picture").offset().top }, 1500); //scrolls down to id called "picture" so user can see the most liked picture, and amount of likes without scrolling
-				              	}
-			              	}
-			            });
+				        // console.log(counter);
 			        }
 		      	}
 		    });
 		}
 	}
+	var token = "token_here"; //api token here
 });
